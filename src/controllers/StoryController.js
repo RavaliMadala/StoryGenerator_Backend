@@ -29,6 +29,10 @@ module.exports = {
                 storyTitle: req.body.title,
                 storyId: story.id,
                 storyVersion: 1,
+                storyPrompt: req.body.storyPrompt,
+                StoryResponse: req.body.StoryResponse,
+                characterName: req.body.characterName,
+                characterRole: req.body.characterRole,
                 setting: req.body.setting,
                 country: req.body.country,
                 language: req.body.language,
@@ -39,6 +43,12 @@ module.exports = {
                 console.log("Story Version control Create.")
                 res.send(storyVersion.toJSON())
             }
+        }
+        else{
+            console.log(err)
+            res.status(400).send({
+                error: 'Some issue occured while saving story.'
+            })
         }
     } catch (err) {
       console.log(err)
