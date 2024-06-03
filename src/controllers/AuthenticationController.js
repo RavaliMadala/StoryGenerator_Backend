@@ -1,3 +1,4 @@
+//Authentication controller
 const {User} = require('../models')
 
 module.exports = {
