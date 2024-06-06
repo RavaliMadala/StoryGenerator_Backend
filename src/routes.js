@@ -12,4 +12,8 @@ module.exports=(app) => {
         AuthenticationController.deleteUser)
     app.post('/saveStory', 
         StoryController.saveStory)
+    app.get('/Stories/:id', 
+        StoryController.getUserStories)
+    app.post('/StoryVersion', 
+        StoryController.addStoryVersion)
 }
