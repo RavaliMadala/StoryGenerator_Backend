@@ -68,11 +68,15 @@ module.exports = {
           attributes: ['id', 'storyTitle', 'userID'],
           where: {
               userID: req.params.id
-          }
+          },
+          order: [
+            ['id', 'DESC'],
+          ]
         })
         var storyReturnFormat = {}
         var storyVersionReturnFormat = []
-        if(story != []){
+        console.log(story)
+        if(story != null && story.length > 0){
           console.log("Stories found.")
           story.forEach(async element => {
             console.log(storyCount)
@@ -84,12 +88,15 @@ module.exports = {
             storyVersionReturnFormat = []
   
             var storyversions = await StoryVersionControl.findAll({
-              attributes: ['storyTitle', 'storyId', 'storyVersion', 'storyPrompt', 'StoryResponse', 'characterName', 'characterRole', 'setting', 'country', 'language', 'genre', 'wordCount'],
+              attributes: ['storyTitle', 'storyId', 'storyVersion', 'storyPrompt', 'StoryResponse', 'characterName', 'characterRole', 'setting', 'country', 'language', 'genre', 'wordCount', 'id'],
               where: {
                 storyId: element.dataValues.id
-              }
+              },
+              order: [
+                ['storyVersion', 'ASC'],
+              ]
             })
-            if(storyversions != []){
+            if(storyversions != null && storyversions.length > 0){
               storyVersionReturnFormat = []
               storyversions.forEach(element1 => {
                 element1.dataValues.StoryResponse = element1.dataValues.StoryResponse.toString('utf8')
@@ -114,10 +121,11 @@ module.exports = {
             }
           })
         }
-
-
+        else{
+          res.send({status:false, response: "No Stories found"})
+        }
       }).then((returnAry)=>{
-        res.send({response: returnAry})
+        res.send({status:true, response: returnAry})
       })
     } catch (err) {
       console.log(err)
@@ -158,6 +166,19 @@ module.exports = {
           console.log("Story Version control Create.")
           res.send(storyVersion.toJSON())
         }
+    }
+  },
+  async deleteStoryVersion (req, res) {
+    try {
+      const storyVersionControl = await StoryVersionControl.destroy({
+        where: { id: req.params.id}
+      })
+      console.log("Deleted Story")
+      res.send({status: "Success", deletedUser: storyVersionControl})
+    } catch (err) {
+      res.status(500).send({
+        error: 'An error has occured trying to delete User: ' + err
+      })
     }
   }
 }
