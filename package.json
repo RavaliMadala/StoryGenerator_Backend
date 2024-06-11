@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node .\\node_modules\\nodemon\\bin\\nodemon.js src\\app.js --exec \"node src\\app.js\""
-  },
+    "start": "nodemon src/app.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,7 +17,6 @@
     "express": "^4.18.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.3.2",
-    "nodemon": "^2.0.22",
     "sequelize": "^6.31.1"
   },
   "devDependencies": {
