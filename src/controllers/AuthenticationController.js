@@ -1,4 +1,4 @@
-const {User} = require('../models')
+const {User, Session} = require('../models')
 
 module.exports = {
   async register (req, res) {
@@ -35,7 +35,31 @@ module.exports = {
         })
       }
 
-      res.send(user.toJSON())
+      let expireTime = new Date();
+      expireTime.setDate(expireTime.getDate() + 1);
+      console.log("ex time" + expireTime)
+      const session = await Session.create({
+        email: user.email,
+        expirationDate: expireTime
+      })
+      console.log("Session after")
+
+      if(session){
+        console.log("return" + session)
+        res.send({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          permission: user.permission,
+          sessionId: session.id
+        })
+      }
+      else{
+        res.status(500).send({
+          error: 'Failed to create New Session'
+        })
+      }
+
       
     } catch (err) {
       res.status(500).send({
@@ -46,6 +70,7 @@ module.exports = {
   async getAllUsers (req, res) {
     try {
       const user = await User.findAll({
+        where: { permission : "User"},
         Limit:30
       })
       console.log("Found User")
