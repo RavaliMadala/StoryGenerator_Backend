@@ -1,3 +1,4 @@
+const { where } = require('sequelize')
 const {Story, StoryVersionControl} = require('../models')
 
 module.exports = {
@@ -13,7 +14,8 @@ module.exports = {
 
         if (existingStory) {
             console.log("Story already exsist.")
-            return res.status(403).send({
+            return res.send({
+              status:"NotOK",
               error: 'Story with Title already exsist.'
             })
         }
@@ -27,7 +29,7 @@ module.exports = {
             console.log("Story Create.")
             const storyVersion = await StoryVersionControl.create({
                 storyTitle: req.body.title,
-                storyId: story.id,
+                StoryId: story.id,
                 storyVersion: 1,
                 storyPrompt: req.body.storyPrompt,
                 StoryResponse: req.body.StoryResponse,
@@ -38,10 +40,18 @@ module.exports = {
                 language: req.body.language,
                 genre: req.body.genre,
                 wordCount: req.body.wordCount,
+                CharacterRoleId: req.body.CharacterRoleId,
+                SettingId: req.body.SettingId,
+                LanguageId: req.body.LanguageId,
+                CountryId: req.body.CountryId,
+                GenreId : req.body.GenreId,
             })
             if(storyVersion){
                 console.log("Story Version control Create.")
-                res.send(storyVersion.toJSON())
+                res.send({
+                  status:"OK",
+                  data:storyVersion.toJSON()
+                })
             }
         }
         else{
@@ -57,7 +67,7 @@ module.exports = {
       })
     }
   },
-  async getUserStories (req, res) {
+  async getUserStoriesOld (req, res) {
     try {
       console.log(req.params.id)
       var returnAry = []
@@ -88,9 +98,9 @@ module.exports = {
             storyVersionReturnFormat = []
   
             var storyversions = await StoryVersionControl.findAll({
-              attributes: ['storyTitle', 'storyId', 'storyVersion', 'storyPrompt', 'StoryResponse', 'characterName', 'characterRole', 'setting', 'country', 'language', 'genre', 'wordCount', 'id'],
+              attributes: ['storyTitle', 'StoryId', 'storyVersion', 'storyPrompt', 'StoryResponse', 'characterName', 'characterRole', 'setting', 'country', 'language', 'genre', 'wordCount', 'id'],
               where: {
-                storyId: element.dataValues.id
+                StoryId: element.dataValues.id
               },
               order: [
                 ['storyVersion', 'ASC'],
@@ -116,8 +126,8 @@ module.exports = {
               storyCount++
             }
             if(storyCount == story.length){
-            console.log(story.length)
-            resolve(returnAry)
+              console.log(story.length)
+              resolve(returnAry)
             }
           })
         }
@@ -134,11 +144,39 @@ module.exports = {
       })
     }
   },
+  async getUserStories (req, res){
+    try {
+      var story = await Story.findAll({
+        attributes: ['id', 'storyTitle', 'userID'],
+        include: [
+          {
+            model: StoryVersionControl
+          }
+        ],
+        where: {
+            userID: req.params.id
+        }
+      })
+
+      story.forEach(element => {
+        element.StoryVersionControls.forEach(element1 => {
+          element1.StoryResponse = element1.StoryResponse.toString('utf8')
+        });
+      });
+
+      res.send(story)
+    } catch (err) {
+      console.log(err)
+      res.status(400).send({
+        error: 'Some issue occured while saving story.'
+      })
+    }
+  },
   async addStoryVersion (req,res) {
     var storyversions = await StoryVersionControl.findOne({
       attributes: ['storyVersion'],
       where: {
-        storyId: req.body.storyId
+        StoryId: req.body.StoryId
       },
       order: [
         ['storyVersion', 'DESC'],
@@ -150,7 +188,7 @@ module.exports = {
       console.log("Story version Create.")
         const storyVersion = await StoryVersionControl.create({
           storyTitle: req.body.title,
-          storyId: req.body.storyId,
+          StoryId: req.body.StoryId,
           storyVersion: storyversions.dataValues.storyVersion + 1,
           storyPrompt: req.body.storyPrompt,
           StoryResponse: req.body.StoryResponse,
@@ -161,6 +199,11 @@ module.exports = {
           language: req.body.language,
           genre: req.body.genre,
           wordCount: req.body.wordCount,
+          CharacterRoleId: req.body.CharacterRoleId,
+          SettingId: req.body.SettingId,
+          LanguageId: req.body.LanguageId,
+          CountryId: req.body.CountryId,
+          GenreId : req.body.GenreId,
         })
         if(storyVersion){
           console.log("Story Version control Create.")
