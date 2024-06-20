@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) =>
         email: {
             type: DataTypes.STRING
           },
-          expirationDate: {
+        expirationDate: {
             type: DataTypes.DATE
           }
     })
