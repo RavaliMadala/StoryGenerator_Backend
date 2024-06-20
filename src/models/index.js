@@ -30,5 +30,23 @@ fs
 
   db.sequelize = sequelize
   db.Sequelize = Sequelize
-  
+
+  db.Setting.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.Setting)
+
+  db.Language.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.Language)
+
+  db.CharacterRole.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.CharacterRole)
+
+  db.Country.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.Country)
+
+  db.Genre.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.Genre)
+
+  db.Story.hasMany(db.StoryVersionControl)
+  db.StoryVersionControl.belongsTo(db.Story)
+
   module.exports = db
